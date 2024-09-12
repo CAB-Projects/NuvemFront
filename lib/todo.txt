@@ -1,0 +1,13 @@
+/avaliacao/all/read
+_________________________________________________________________________________________________________________________________________________________________
+Falta para acabar o front:                
+    -> colocar a avaliação na barra de sugestões! 
+_________________________________________________________________________________________________________________________________________________________________
+
+O que falta para o back:
+    -> criar requisição que manda uma lista com todos os id e avaliação das receitas para o front
+    -> erro ao Alterar a Avaliação (duplicate entry)
+
+O que falta para a Apresentação:
+    -> selecionar receitas de exemplo para serem adicionadas
+    -> atualizar o Trello
