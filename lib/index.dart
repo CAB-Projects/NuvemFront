@@ -21,20 +21,33 @@ validaNullClean(value) {
 
 //Cadastro/Login:
 class RegisterUser {
+  int tipo;
   int id;
   String nome;
   String email;
   String senha;
 
-  RegisterUser(this.id, this.nome, this.email, this.senha);
+  RegisterUser(this.id, this.tipo, this.nome, this.email, this.senha);
 
   Map<String, dynamic> toJson() {
-    return {
-      'usuario': "user",
-      'nome': nome,
-      'email': email,
-      'senha': senha,
-    };
+    switch (tipo) {
+      case 0:
+        return {
+          'usuario': "cliente",
+          'nome': nome,
+          'email': email,
+          'senha': senha,
+        };
+      case 1:
+        return {
+          'usuario': "restaurante",
+          'nome': nome,
+          'email': email,
+          'senha': senha,
+        };
+      default:
+        return {'tipo': '', 'nome': '', 'email': '', 'senha': '', 'ultimo': ''};
+    }
   }
 
   Map<String, dynamic> updateToJson() {
@@ -48,7 +61,7 @@ class RegisterUser {
 }
 
 Future<int> cadastro(tipo, nome, email, senha, ultimo) async {
-  RegisterUser newUser = RegisterUser(tipo, nome, email, senha);
+  RegisterUser newUser = RegisterUser(0, tipo, nome, email, senha);
 
   String jsonUser = jsonEncode(newUser.toJson());
 
@@ -68,8 +81,8 @@ Future<int> cadastro(tipo, nome, email, senha, ultimo) async {
   return response.statusCode;
 }
 
-Future<int> update(id, nome, email, senha) async {
-  RegisterUser newUser = RegisterUser(id, nome, email, senha);
+Future<int> update(id, tipo, nome, email, senha) async {
+  RegisterUser newUser = RegisterUser(id, tipo, nome, email, senha);
 
   String jsonUser = jsonEncode(newUser.updateToJson());
 
@@ -192,14 +205,13 @@ class Receita {
   }
 }
 
-void criaReceita(
-    tituloReceitas, descricao, id, idUsuario, requisitos, preparo) async {
+void criaReceita(tituloReceitas, descricao, id, idUsuario, preco) async {
   Receita novaReceita = Receita(
       tituloReceitas: tituloReceitas,
       descricao: descricao,
       id: 'id',
-      requisitos: requisitos,
-      preparo: preparo);
+      requisitos: preco,
+      preparo: 'preparo');
   String jsonReceita = jsonEncode(novaReceita.toJson(idUsuario));
   http.Response response = await http.post(
     Uri.parse("http://localhost:8000/receita/cadastro"),
@@ -279,14 +291,13 @@ void deletaReceita(idReceita) async {
   }
 }
 
-void updateReceita(
-    tituloReceitas, descricao, id, idUsuario, requisitos, preparo) async {
+void updateReceita(tituloReceitas, descricao, id, idUsuario, preco) async {
   Receita novaReceita = Receita(
       tituloReceitas: tituloReceitas,
       descricao: descricao,
       id: id,
-      requisitos: requisitos,
-      preparo: preparo);
+      requisitos: preco,
+      preparo: 'preparo');
   String jsonReceita = jsonEncode(novaReceita.toJson(idUsuario));
   http.Response response = await http.post(
     Uri.parse("http://localhost:8000/receita/update"),
@@ -313,9 +324,15 @@ class LoggedUser {
 
   Map<String, dynamic> toJson() {
     switch (tipo) {
+      case 0:
+        return {
+          'usuario': "cliente",
+          'email': email,
+          'senha': senha,
+        };
       case 1:
         return {
-          'usuario': "user",
+          'usuario': "restaurante",
           'email': email,
           'senha': senha,
         };

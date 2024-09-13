@@ -5,85 +5,74 @@ import 'package:receita_front/all.dart';
 import '/main.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
-class Usuario extends StatefulWidget {
+class Restaurante extends StatefulWidget {
   @override
-  State<Usuario> createState() => _UsuarioState();
+  State<Restaurante> createState() => _RestauranteState();
 }
 
-class _UsuarioState extends State<Usuario> {
+class _RestauranteState extends State<Restaurante> {
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final userController = TextEditingController();
+
+  late Future<List<Map<String, String>>> dataFuture;
+  //late int likes;
+  //late Future<bool> likeOrNot;
+  //late Icon LikeIcon; // = Icon(Icons.favorite_outline)
+  late Future<double> initRating;
+
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
-    var User = appState.logged;
-    var Nome = User.nome;
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 50, horizontal: 150),
-        child: Container(
-          padding: EdgeInsets.all(12.0),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(
-              color: Colors.white,
+    LoggedUser restaurante = appState.restauranteAtual;
+    var Nome = restaurante.nome;
+//---------------------------------------------------------------------------------------------Pegar do Back! ^^^-----------------------------------------------------------
+    /*likeAndDislike() {
+      if (appState.liked) {
+        setState(() {
+          LikeIcon = Icon(Icons.favorite_outline);
+        });
+      } else {
+        setState(() {
+          LikeIcon = Icon(Icons.favorite);
+        });
+      }
+    }*/
+
+    int rating = 0;
+
+    return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
+      appBar: AppBar(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              Nome,
+              style: TextStyle(fontSize: 25),
             ),
-            borderRadius: BorderRadius.all(Radius.circular(20)),
-          ),
-          child: DefaultTabController(
-            length: 2,
-            child: Scaffold(
-              appBar: AppBar(
-                /*bottom: const TabBar(
-                  tabs: [
-                    Tab(
-                      text: "Curtidas",
-                    ),
-                    Tab(
-                      text: "Minhas Receitas",
-                    ),
-                  ],
-                ),*/
-                title: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Olá, $Nome',
-                      style: TextStyle(fontSize: 25),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        IconButton(
-                          icon: Icon(Icons.add),
-                          tooltip: "Criar Receita",
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => CrudReceitas(),
-                              ),
-                            );
-                          },
-                        ),
-                        SizedBox(
-                          width: 20,
-                        ),
-                        ElevatedButton(
-                          onPressed: () {
-                            appState.setPage(AttCadastroPage());
-                          },
-                          child: Text('Atualizar\nCadastro'),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+            RatingBar(
+              ignoreGestures: true,
+              initialRating: getNota(list[index].id, notas), //initRating,
+              direction: Axis.horizontal,
+              allowHalfRating: false,
+              itemCount: 5,
+              itemSize: 25,
+              ratingWidget: RatingWidget(
+                full: Icon(Icons.star),
+                half: Icon(Icons.star_half_outlined),
+                empty: Icon(Icons.star_border),
               ),
-              body: Receitas(),
+              itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+              onRatingUpdate: (rating) {
+                //print(rating);
+                avaliar(rating, appState.logged.id, appState.receitaAtual.id);
+              },
             ),
-          ),
+          ],
         ),
+        titleTextStyle: Theme.of(context).textTheme.headlineMedium,
       ),
+      body: Receitas(),
     );
   }
 }

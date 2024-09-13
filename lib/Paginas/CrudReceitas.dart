@@ -16,22 +16,20 @@ class CrudReceitas extends StatefulWidget {
 class CrudReceitasCrudState extends State<CrudReceitas> {
   final tituloController = TextEditingController();
   final descricaoController = TextEditingController();
-  final requisitosController = TextEditingController();
-  final preparoController = TextEditingController();
+  final precoController = TextEditingController();
+  // final preparoController = TextEditingController();
   String tituloReceitas = '';
   String descricao = '';
+  String preco = '';
   int id = Random().nextInt(1000);
-
-  String requisitos = '';
-  String preparo = '';
 
   //TextInputFormatter _inputFormatter1 = FilteringTextInputFormatter.digitsOnly;         receber so numeros
 
   void submitForm() {
     tituloController.clear();
     descricaoController.clear();
-    requisitosController.clear();
-    preparoController.clear();
+    precoController.clear();
+    //preparoController.clear();
   }
 
   @override
@@ -67,23 +65,12 @@ class CrudReceitasCrudState extends State<CrudReceitas> {
             },
           ),
           TextFormField(
-            controller: requisitosController,
-            decoration: InputDecoration(labelText: 'Ingredientes'),
+            controller: precoController,
+            decoration: InputDecoration(labelText: 'Preço'),
             maxLines: null,
             onChanged: (value) {
               setState(() {
-                requisitos = value;
-              });
-            },
-          ),
-          TextFormField(
-            controller: preparoController,
-            //inputFormatters: [_inputFormatter1],                      usado para receber so numeros
-            decoration: InputDecoration(labelText: 'Modo de Preparo'),
-            maxLines: null,
-            onChanged: (value) {
-              setState(() {
-                preparo = value;
+                preco = value;
               });
             },
           ),
@@ -107,13 +94,13 @@ class CrudReceitasCrudState extends State<CrudReceitas> {
                         onPressed: () {
                           Navigator.of(context).pop();
                           criaReceita(tituloReceitas, descricao, 0,
-                              appState.logged.id, requisitos, preparo);
+                              appState.logged.id, preco);
                           appState.adicionarReceita(Receita(
                               tituloReceitas: tituloReceitas,
                               descricao: descricao,
                               id: '',
-                              requisitos: requisitos,
-                              preparo: preparo));
+                              requisitos: 'requisitos',
+                              preparo: 'preparo'));
                           submitForm();
                           Navigator.of(context).pop();
                         },
@@ -139,16 +126,13 @@ class CrudEditarReceitas extends StatefulWidget {
 class EditarReceitasCrudState extends State<CrudEditarReceitas> {
   final tituloController = TextEditingController();
   final descricaoController = TextEditingController();
-  final requisitosController = TextEditingController();
-  final preparoController = TextEditingController();
+  final precoController = TextEditingController();
 
   //TextInputFormatter _inputFormatter1 = FilteringTextInputFormatter.digitsOnly;         receber so numeros
 
   void submitForm() {
     tituloController.clear();
     descricaoController.clear();
-    requisitosController.clear();
-    preparoController.clear();
   }
 
   @override
@@ -158,7 +142,7 @@ class EditarReceitasCrudState extends State<CrudEditarReceitas> {
     String id = receita.id;
     String tituloReceitas = receita.tituloReceitas;
     String descricao = receita.descricao;
-    String requisitos = receita.requisitos;
+    String preco = receita.requisitos;
     String preparo = receita.preparo;
 
     return Scaffold(
@@ -190,23 +174,12 @@ class EditarReceitasCrudState extends State<CrudEditarReceitas> {
             },
           ),
           TextFormField(
-            controller: requisitosController,
-            decoration: InputDecoration(labelText: 'Editar ingredientes'),
+            controller: precoController,
+            decoration: InputDecoration(labelText: 'Editar preço'),
             maxLines: null,
             onChanged: (value) {
               setState(() {
-                requisitos = value;
-              });
-            },
-          ),
-          TextFormField(
-            controller: preparoController,
-            //inputFormatters: [_inputFormatter1],                      usado para receber so numeros
-            decoration: InputDecoration(labelText: 'Editar modo de Preparo'),
-            maxLines: null,
-            onChanged: (value) {
-              setState(() {
-                preparo = value;
+                preco = value;
               });
             },
           ),
@@ -234,8 +207,7 @@ class EditarReceitasCrudState extends State<CrudEditarReceitas> {
                               descricaoController.text,
                               id,
                               appState.logged.id,
-                              requisitosController.text,
-                              preparoController.text);
+                              preco);
                           submitForm();
                           setState(() {
                             Navigator.of(context).pop();

@@ -17,7 +17,7 @@ class MyHomePageState extends State<MyHomePage> {
     ),
     const NavigationRailDestination(
       icon: Icon(Icons.home),
-      label: Text('Pagina de Restaurante'),
+      label: Text('Pagina de Usuário'),
     ),
     /*const NavigationRailDestination(
       icon: Icon(Icons.favorite),
@@ -45,17 +45,19 @@ class MyHomePageState extends State<MyHomePage> {
     ),*/
   ];
 
-  Widget updatePage(selectedIndex) {
-    final Options = [
-      SearchPreview(),
-      Usuario(),
-      //CommentPreview(),
-      //AttCadastroPage(),
-      //LikePreview(),
-      //CrudReceitas(),
-      //CrudEditarReceitas(),
-      //Receitas()
-    ];
+  Widget updatePage(selectedIndex, tipo) {
+    List<StatefulWidget> Options = [];
+    if (tipo == 0) {
+      Options = [
+        SearchPreview(),
+        AttCadastroPage(),
+      ];
+    } else {
+      Options = [
+        SearchPreview(),
+        Usuario(),
+      ];
+    }
     return Options[selectedIndex];
   }
 
@@ -73,7 +75,7 @@ class MyHomePageState extends State<MyHomePage> {
       destinations: testes,
       selectedIndex: appState.selectedIndex,
       onDestinationSelected: (value) {
-        appState.setPage(updatePage(value));
+        appState.setPage(updatePage(value, appState.logged.tipo));
         setState(() {
           appState.setIndex(value);
         });

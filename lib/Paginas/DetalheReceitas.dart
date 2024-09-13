@@ -60,10 +60,10 @@ class _DetalheReceitaState extends State<DetalheReceita> {
               children: [
                 Text('Descrição: ${receita.descricao}',
                     style: TextStyle(fontSize: 25)),
-                Text('Ingredientes: ${receita.requisitos}',
+                Text('Preço: ${receita.requisitos}',
                     style: TextStyle(fontSize: 20)),
-                Text('Modo de Preparo: ${receita.preparo}',
-                    style: TextStyle(fontSize: 20)),
+                /*Text('Modo de Preparo: ${receita.preparo}',
+                    style: TextStyle(fontSize: 20)),*/
                 FutureBuilder<List<dynamic>>(
                   future: Future.wait([
                     likedOrNot(appState.logged.id, appState.receitaAtual.id),

@@ -179,4 +179,7 @@ class MyAppState extends ChangeNotifier {
   }
 
   placeholder() {}
+
+  //restaurante atual
+  LoggedUser restauranteAtual = LoggedUser(-1, 'email', 'senha', 'nome', 0);
 }
