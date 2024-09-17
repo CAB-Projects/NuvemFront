@@ -53,7 +53,7 @@ Future<int> cadastro(tipo, nome, email, senha, ultimo) async {
   String jsonUser = jsonEncode(newUser.toJson());
 
   http.Response response = await http.post(
-    Uri.parse("http://192.168.17.3:8000/cadastro"),
+    Uri.parse("http://192.168.17.3:8000/api/cadastro"),
     headers: {'Content-Type': 'application/json'},
     body: jsonUser,
   );
@@ -74,7 +74,7 @@ Future<int> update(id, nome, email, senha) async {
   String jsonUser = jsonEncode(newUser.updateToJson());
 
   http.Response response = await http.post(
-    Uri.parse("http://192.168.17.3:8000/update"),
+    Uri.parse("http://192.168.17.3:8000/api/update"),
     headers: {'Content-Type': 'application/json'},
     body: jsonUser,
   );
@@ -91,7 +91,7 @@ Future<int> update(id, nome, email, senha) async {
 
 Future<String> getNome(email) async {
   http.Response response = await http.get(
-    Uri.parse("http://192.168.17.3:8000/recuperarNome/$email"),
+    Uri.parse("http://192.168.17.3:8000/api/recuperarNome/$email"),
     headers: {'Content-Type': 'application/json'},
   );
 
@@ -127,7 +127,7 @@ Future<int> atualizarSenha(String testeNome, String email, String novaSenha,
 
   try {
     http.Response response = await http.post(
-      Uri.parse("http://192.168.17.3:8000/updateSenha"),
+      Uri.parse("http://192.168.17.3:8000/api/updateSenha"),
       headers: {'Content-Type': 'application/json'},
       body: jsonUser,
     );
@@ -202,7 +202,7 @@ void criaReceita(
       preparo: preparo);
   String jsonReceita = jsonEncode(novaReceita.toJson(idUsuario));
   http.Response response = await http.post(
-    Uri.parse("http://192.168.17.3:8000/receita/cadastro"),
+    Uri.parse("http://192.168.17.3:8000/api/receita/cadastro"),
     headers: {'Content-Type': 'application/json'},
     body: jsonReceita,
   );
@@ -221,7 +221,7 @@ Future<List<Receita>> listaReceitas() async {
   List<Receita> receitas = [];
 
   http.Response response = await http.post(
-    Uri.parse('http://192.168.17.3:8000/receita/read/all'),
+    Uri.parse('http://192.168.17.3:8000/api/receita/read/all'),
     headers: {'Content-Type': 'application/json'},
   );
 
@@ -238,7 +238,7 @@ Future<List<Receita>> listaReceitas() async {
 Future<List<Receita>> listaCriadas(id) async {
   List<Receita> criadas = [];
 
-  String url = "http://192.168.17.3:8000/receita/usuario/read/$id";
+  String url = "http://192.168.17.3:8000/api/receita/usuario/read/$id";
 
   http.Response response = await http.get(
     Uri.parse(url),
@@ -267,7 +267,7 @@ void deletaReceita(idReceita) async {
   String json = jsonEncode(receita.toJson(0));
 
   http.Response response = await http.post(
-    Uri.parse("http://192.168.17.3:8000/receita/delete"),
+    Uri.parse("http://192.168.17.3:8000/api/receita/delete"),
     headers: {'Content-Type': 'application/json'},
     body: json,
   );
@@ -289,7 +289,7 @@ void updateReceita(
       preparo: preparo);
   String jsonReceita = jsonEncode(novaReceita.toJson(idUsuario));
   http.Response response = await http.post(
-    Uri.parse("http://192.168.17.3:8000/receita/update"),
+    Uri.parse("http://192.168.17.3:8000/api/receita/update"),
     headers: {'Content-Type': 'application/json'},
     body: jsonReceita,
   );
@@ -345,7 +345,7 @@ Future<LoggedUser> login(tipo, email, senha) async {
   LoggedUser user = LoggedUser(tipo, email, senha, '', 0);
   String jsonUser = jsonEncode(user.toJson());
   http.Response response = await http.post(
-    Uri.parse("http://192.168.17.3:8000/login"),
+    Uri.parse("http://192.168.17.3:8000/api/login"),
     headers: {'Content-Type': 'application/json'},
     body: jsonUser,
   );
@@ -389,7 +389,7 @@ class Curtida {
 Future<List<Receita>> getLiked(id) async {
   List<Receita> curtidas = [];
 
-  String url = "http://192.168.17.3:8000/curtida/all/read/$id";
+  String url = "http://192.168.17.3:8000/api/curtida/all/read/$id";
 
   http.Response response = await http.get(
     Uri.parse(url),
@@ -410,7 +410,7 @@ Future<List<Receita>> getLiked(id) async {
 Future<bool> likedOrNot(idUser, idReceita) async {
   bool liked = false;
 
-  String url = "http://192.168.17.3:8000/curtida/read/$idUser/$idReceita";
+  String url = "http://192.168.17.3:8000/api/curtida/read/$idUser/$idReceita";
 
   http.Response response = await http.get(
     Uri.parse(url),
@@ -435,7 +435,7 @@ void toggleLike(idUsuario, idReceita) async {
   String json = jsonEncode(receita);
 
   http.Response response = await http.post(
-    Uri.parse("http://192.168.17.3:8000/curtida/cadastro"),
+    Uri.parse("http://192.168.17.3:8000/api/curtida/cadastro"),
     headers: {'Content-Type': 'application/json'},
     body: json,
   );
@@ -449,7 +449,7 @@ void toggleLike(idUsuario, idReceita) async {
 Future<int> countLikes(idReceita) async {
   int count = 0;
 
-  String url = "http://192.168.17.3:8000/curtida/count/$idReceita";
+  String url = "http://192.168.17.3:8000/api/curtida/count/$idReceita";
   http.Response response = await http.get(
     Uri.parse(url),
     headers: {'Content-Type': 'application/json'},
@@ -500,7 +500,7 @@ void avaliar(rating, userId, recipeId) async {
     'nota': rating
   };
   String json = jsonEncode(like);
-  String url = "http://192.168.17.3:8000/avaliacao/cadastro";
+  String url = "http://192.168.17.3:8000/api/avaliacao/cadastro";
 
   http.Response response = await http.post(
     Uri.parse(url),
@@ -518,7 +518,7 @@ void avaliar(rating, userId, recipeId) async {
 void comentar(texto, userId, recipeId) async {
   Comentario newComment = Comentario(userId, '0', texto, recipeId.toString());
   String json = jsonEncode(newComment.toJson());
-  String url = "http://192.168.17.3:8000/comentario/cadastro";
+  String url = "http://192.168.17.3:8000/api/comentario/cadastro";
 
   http.Response response = await http.post(
     Uri.parse(url),
@@ -565,7 +565,7 @@ Future<List<Receita>> pesquisaComFiltro(texto, filtro) async {
 
   Pesquisa pesquisa = Pesquisa(pesquisaString, filtro);
   List<Receita> sugestoes = [];
-  String url = "http://192.168.17.3:8000/filtro/read";
+  String url = "http://192.168.17.3:8000/api/filtro/read";
   String jsonSearch = jsonEncode(pesquisa.toJson());
 
   http.Response response = await http.post(Uri.parse(url),
@@ -583,7 +583,7 @@ Future<List<Receita>> pesquisaComFiltro(texto, filtro) async {
 
 Future<List<Map<String, dynamic>>> allAval() async {
   List<Map<String, dynamic>> minhaLista = [];
-  String url = "http://192.168.17.3:8000/avaliacao/all/read";
+  String url = "http://192.168.17.3:8000/api/avaliacao/all/read";
 
   http.Response response = await http
       .get(Uri.parse(url), headers: {'Content-Type': 'application/json'});
@@ -611,7 +611,7 @@ Future<double> AvaliacaoRead(id_receitas, id_usuario) async {
     'id_usuario': id_usuario,
     'id_receitas': id_receitas,
   };
-  String url = "http://192.168.17.3:8000/avaliacao/usuario/read";
+  String url = "http://192.168.17.3:8000/api/avaliacao/usuario/read";
   String jsonid = jsonEncode(data);
 
   http.Response response = await http.post(Uri.parse(url),
@@ -632,7 +632,7 @@ Future<double> AvaliacaoRead(id_receitas, id_usuario) async {
 Future<List<Map<String, String>>> fetchComments(id) async {
   List<Map<String, String>> comentarios = [];
 
-  String url = "http://192.168.17.3:8000/comentario/read/$id";
+  String url = "http://192.168.17.3:8000/api/comentario/read/$id";
 
   http.Response response = await http.get(
     Uri.parse(url),
