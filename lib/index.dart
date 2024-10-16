@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-string ip_base = "http://192.168.138.132:80";
+string ip_base = "localhost";
 
 validaNull(value) {
   if (value == null || value.isEmpty) {
