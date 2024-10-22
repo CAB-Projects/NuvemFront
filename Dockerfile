@@ -1,19 +1,33 @@
-# Use a base image
-FROM ubuntu:22.04
+# Etapa 1: Construir o projeto Flutter
+FROM cirrusci/flutter:stable as build
 
-# Set the working directory
+# Definir o diretório de trabalho
 WORKDIR /app
 
-# Install necessary packages
+# Copiar o arquivo de dependências e instalar
+COPY pubspec.yaml .
+RUN flutter pub get
 
-
-# Copy your application files
+# Copiar o código fonte do projeto
 COPY . .
 
-# Install dependencies (?)
+# Construir o projeto para a web
+RUN flutter build web --release
+#====================================================================
+# Etapa 2: Configurar o NGINX para servir o app Flutter
+FROM nginx:alpine
 
-# Expose the port your application runs on
-#EXPOSE 5000
+# Remover a configuração padrão do NGINX
+RUN rm /etc/nginx/conf.d/default.conf
 
-# Define the command to run your application
-#CMD ["python3", "app.py"]
+# Copiar a configuração customizada do NGINX
+COPY nginx.conf /etc/nginx/conf.d/
+
+# Copiar o build da etapa anterior para o diretório do NGINX
+COPY --from=build /app/build/web /usr/share/nginx/html
+
+# Expor a porta onde o NGINX vai rodar
+EXPOSE 80
+
+# Iniciar o NGINX
+CMD ["nginx", "-g", "daemon off;"]
