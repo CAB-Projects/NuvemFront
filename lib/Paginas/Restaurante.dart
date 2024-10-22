@@ -50,7 +50,7 @@ class _RestauranteState extends State<Restaurante> {
               Nome,
               style: TextStyle(fontSize: 25),
             ),
-            RatingBar(
+            /*RatingBar(
               ignoreGestures: true,
               initialRating: getNota(list[index].id, notas), //initRating,
               direction: Axis.horizontal,
@@ -68,6 +68,7 @@ class _RestauranteState extends State<Restaurante> {
                 avaliar(rating, appState.logged.id, appState.receitaAtual.id);
               },
             ),
+          */
           ],
         ),
         titleTextStyle: Theme.of(context).textTheme.headlineMedium,
