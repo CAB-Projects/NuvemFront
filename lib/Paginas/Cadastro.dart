@@ -162,6 +162,7 @@ class _AttCadastroPageState extends State<AttCadastroPage> {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
+    var Nome = appState.logged.nome;
 
     return Center(
       child: Padding(
@@ -181,6 +182,10 @@ class _AttCadastroPageState extends State<AttCadastroPage> {
             autovalidateMode: AutovalidateMode.always,
             child: Column(
               children: [
+                Text(
+                  'Olá, $Nome',
+                  style: TextStyle(fontSize: 25),
+                ),
                 Text('Atualização de Cadastro'),
                 Padding(
                   padding: EdgeInsets.all(12),
@@ -246,6 +251,7 @@ class _AttCadastroPageState extends State<AttCadastroPage> {
                             } else {
                               int resposta = await update(
                                 appState.logged.id,
+                                appState.logged.tipo,
                                 nomeController.text,
                                 emailController.text,
                                 passwordController.text,

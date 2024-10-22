@@ -146,13 +146,14 @@ class _SearchPreviewState extends State<SearchPreview> {
                                     trailing: IconButton(
                                       icon: Icon(Icons.menu),
                                       onPressed: () {
-                                        appState.receitaAtual = list[
+                                        appState.restauranteAtual = list[
                                             index]; // Agora atribui uma instância de Receita
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) =>
-                                                DetalheReceita(),
+                                                //DetalheReceita(),
+                                                Restaurante(),
                                           ),
                                         );
                                       },

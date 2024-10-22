@@ -13,3 +13,4 @@ export 'index.dart';
 export 'package:receita_front/Paginas/CrudReceitas.dart';
 export 'package:receita_front/Paginas/DetalheReceitas.dart';
 export 'package:receita_front/Paginas/Usuario.dart';
+export 'package:receita_front/Paginas/Restaurante.dart';

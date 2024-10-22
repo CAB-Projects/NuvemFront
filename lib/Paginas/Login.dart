@@ -12,7 +12,8 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  var tipoSelecionado = 1;
+  final List<bool> _tipoCadastrado = <bool>[true, false];
+  var tipoSelecionado = 0;
 
   final userController = TextEditingController();
   final passwordController = TextEditingController();
@@ -25,8 +26,8 @@ class _LoginPageState extends State<LoginPage> {
       child: Container(
         padding: EdgeInsets.all(16.0),
         alignment: Alignment.center,
-        width: 400,
-        height: 350,
+        width: 500,
+        height: 400,
         decoration: BoxDecoration(
           color: Colors.white,
           border: Border.all(
@@ -40,6 +41,24 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             children: [
               Text('LOGIN'),
+              ToggleButtons(
+                onPressed: (int index) {
+                  setState(() {
+                    // The button that is tapped is set to true, and the others to false.
+                    for (int i = 0; i < _tipoCadastrado.length; i++) {
+                      _tipoCadastrado[i] = i == index;
+                    }
+                    tipoSelecionado = index;
+                  });
+                },
+                borderRadius: const BorderRadius.all(Radius.circular(8)),
+                constraints: const BoxConstraints(
+                  minHeight: 40.0,
+                  minWidth: 80.0,
+                ),
+                isSelected: _tipoCadastrado,
+                children: Tipos,
+              ),
               Padding(
                 padding: EdgeInsets.all(10),
                 child: TextFormField(
@@ -86,7 +105,8 @@ class _LoginPageState extends State<LoginPage> {
                     }
                     appState.logar(loggedUser);
                     if (loggedUser.tipo != 204) {
-                      appState.setPage(MyHomePageState().updatePage(0));
+                      appState.setPage(
+                          MyHomePageState().updatePage(0, loggedUser.tipo));
                     }
                   }
                 },
