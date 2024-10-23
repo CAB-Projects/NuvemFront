@@ -46,6 +46,9 @@ RUN useradd -ms /bin/bash flutteruser
 # Set the working directory
 WORKDIR /app
 
+# Ajustar permissões para o novo usuário
+RUN chown -R flutteruser:flutteruser /app
+
 # Alterar para o novo usuário
 USER flutteruser
 
