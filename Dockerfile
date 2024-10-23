@@ -1,60 +1,33 @@
-# Stage 1: Build the Flutter application
-FROM debian:bullseye-slim AS builder
+# Etapa 1: Construir o projeto Flutter
+FROM cirrusci/flutter:stable AS build
 
-# Avoid interactive prompts during package installation
-ENV DEBIAN_FRONTEND=noninteractive
+# Definir o diretório de trabalho
+WORKDIR /app
 
-# Install required dependencies
-RUN apt-get update && apt-get install -y \
-    curl \
-    git \
-    unzip \
-    xz-utils \
-    libglu1-mesa \
-    wget \
-    cmake \
-    ninja-build \
-    && rm -rf /var/lib/apt/lists/*
+# Copiar o arquivo de dependências e instalar
+COPY pubspec.yaml .
+RUN flutter pub get
 
-# Create a non-root user
-RUN groupadd -r flutter && useradd -r -g flutter -m -d /home/flutter flutter
+# Copiar o código fonte do projeto
+COPY . .
 
-# Set up Flutter environment
-ENV FLUTTER_HOME=/home/flutter/sdk
-ENV PATH=$FLUTTER_HOME/bin:$PATH
+# Construir o projeto para a web
+RUN flutter build web --release
 
-# Download Flutter SDK as non-root user
-USER flutter
-RUN mkdir -p $FLUTTER_HOME && \
-    wget -O flutter.tar.xz "https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.24.3-stable.tar.xz" && \
-    tar -xf flutter.tar.xz --strip-components=1 -C $FLUTTER_HOME && \
-    rm flutter.tar.xz
-
-# Configure Flutter
-RUN cd $FLUTTER_HOME && \
-    git config --global --add safe.directory $FLUTTER_HOME && \
-    flutter config --no-analytics && \
-    flutter config --enable-web && \
-    flutter doctor -v
-
-# Set the working directory
-WORKDIR /home/flutter/app
-
-# Copy the Flutter project files with correct ownership
-COPY --chown=flutter:flutter . .
-
-# Get Flutter dependencies and build
-RUN flutter pub get && \
-    flutter build web --release
-
-# Stage 2: Serve the application using Nginx
+# Etapa 2: Configurar o NGINX para servir o app Flutter
 FROM nginx:alpine
 
-# Copy the built Flutter web app to Nginx's serve directory
-COPY --from=builder /home/flutter/app/build/web /usr/share/nginx/html
+# Remover a configuração padrão do NGINX
+RUN rm /etc/nginx/conf.d/default.conf
 
-# Expose port 80
+# Copiar a configuração customizada do NGINX
+COPY nginx.conf /etc/nginx/conf.d/
+
+# Copiar o build da etapa anterior para o diretório do NGINX
+COPY --from=build /app/build/web /usr/share/nginx/html
+
+# Expor a porta onde o NGINX vai rodar
 EXPOSE 80
 
-# Start Nginx server
+# Iniciar o NGINX
 CMD ["nginx", "-g", "daemon off;"]
