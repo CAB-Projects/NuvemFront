@@ -1,5 +1,5 @@
 # Stage 1: Build the Flutter application
-FROM ubuntu:22.04 AS builder
+FROM debian:bullseye-slim AS builder
 
 # Avoid interactive prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
@@ -10,53 +10,51 @@ RUN apt-get update && apt-get install -y \
     git \
     unzip \
     xz-utils \
-    zip \
     libglu1-mesa \
-    openjdk-11-jdk \
     wget \
-    clang \
     cmake \
     ninja-build \
-    pkg-config \
-    libgtk-3-dev \
     && rm -rf /var/lib/apt/lists/*
 
+# Create a non-root user
+RUN groupadd -r flutter && useradd -r -g flutter -m -d /home/flutter flutter
+
 # Set up Flutter environment
-ENV FLUTTER_HOME=/usr/local/flutter
+ENV FLUTTER_HOME=/home/flutter/sdk
 ENV PATH=$FLUTTER_HOME/bin:$PATH
 
-RUN wget https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.24.3-stable.tar.xz \
-    && tar xf flutter_linux_3.24.3-stable.tar.xz -C /usr/local/ \
-    && rm flutter_linux_3.24.3-stable.tar.xz \
-    && flutter doctor \
-    && flutter config --no-analytics \
-    && flutter config --enable-web
+# Download Flutter SDK as non-root user
+USER flutter
+RUN mkdir -p $FLUTTER_HOME && \
+    wget -O flutter.tar.xz "https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.24.3-stable.tar.xz" && \
+    tar -xf flutter.tar.xz --strip-components=1 -C $FLUTTER_HOME && \
+    rm flutter.tar.xz
 
-# Criar um novo usuário não-root
-RUN useradd -ms /bin/bash flutteruser
+# Configure Flutter
+RUN cd $FLUTTER_HOME && \
+    git config --global --add safe.directory $FLUTTER_HOME && \
+    flutter config --no-analytics && \
+    flutter config --enable-web && \
+    flutter doctor -v
 
 # Set the working directory
-WORKDIR /app
+WORKDIR /home/flutter/app
 
-# Copy the Flutter project files
-COPY . .
+# Copy the Flutter project files with correct ownership
+COPY --chown=flutter:flutter . .
 
-# Ajustar permissões para o novo usuário após a cópia
-RUN chown -R flutteruser:flutteruser /app
-
-# Alterar para o novo usuário
-USER flutteruser
-
-# Get Flutter dependencies
-RUN flutter pub get
-
-# Build for web
-RUN flutter build web --release
+# Get Flutter dependencies and build
+RUN flutter pub get && \
+    flutter build web --release
 
 # Stage 2: Serve the application using Nginx
 FROM nginx:alpine
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=builder /app/build/web /usr/share/nginx/html
 
+# Copy the built Flutter web app to Nginx's serve directory
+COPY --from=builder /home/flutter/app/build/web /usr/share/nginx/html
+
+# Expose port 80
 EXPOSE 80
+
+# Start Nginx server
 CMD ["nginx", "-g", "daemon off;"]
