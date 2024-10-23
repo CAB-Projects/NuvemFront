@@ -32,31 +32,22 @@ RUN wget https://storage.googleapis.com/flutter_infra_release/releases/stable/li
     && flutter config --no-analytics \
     && flutter config --enable-web
 
-# Download and setup Flutter SDK
-#RUN git clone https://github.com/flutter/flutter.git $FLUTTER_HOME && \
-#    cd $FLUTTER_HOME && \
-#    git checkout 3.24.3 && \
-#    flutter doctor && \
-#    flutter config --no-analytics && \
-#    flutter config --enable-web
-
-# Criar um novo usuário não-root
+# Create a non-root user
 RUN useradd -ms /bin/bash flutteruser
 
 # Set the working directory
 WORKDIR /app
 
-# Ajustar permissões para o novo usuário
-RUN chown -R flutteruser:flutteruser /app
-
-# Alterar para o novo usuário
-USER flutteruser
-
 # Copy the Flutter project files
 COPY . .
 
+# Set proper permissions for the Flutter project
+RUN chown -R flutteruser:flutteruser /app $FLUTTER_HOME
+
+# Switch to non-root user
+USER flutteruser
+
 # Get Flutter dependencies
-#RUN flutter pub cache repair
 RUN flutter pub get
 
 # Build for web
