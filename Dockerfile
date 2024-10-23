@@ -40,29 +40,29 @@ RUN wget https://storage.googleapis.com/flutter_infra_release/releases/stable/li
 #    flutter config --no-analytics && \
 #    flutter config --enable-web
 
+# Criar um novo usuário não-root
+RUN useradd -ms /bin/bash flutteruser
+
 # Set the working directory
 WORKDIR /app
 
-# Copy the Flutter project files
-COPY . .
+# Alterar para o novo usuário
+USER flutteruser
 
 # Get Flutter dependencies
+RUN flutter pub cache repair
 RUN flutter pub get
+
+# Copy the Flutter project files
+COPY . .
 
 # Build for web
 RUN flutter build web --release
 
 # Stage 2: Serve the application using Nginx
 FROM nginx:alpine
-
-# Copy the built Flutter web app to Nginx's serve directory
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/build/web /usr/share/nginx/html
 
-# Copy custom Nginx configuration if needed
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Expose port 80
 EXPOSE 80
-
-# Start Nginx server
 CMD ["nginx", "-g", "daemon off;"]
