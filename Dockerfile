@@ -50,7 +50,7 @@ WORKDIR /app
 USER flutteruser
 
 # Get Flutter dependencies
-RUN flutter pub cache repair
+#RUN flutter pub cache repair
 RUN flutter pub get
 
 # Copy the Flutter project files
