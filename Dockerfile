@@ -1,34 +1,68 @@
-# Etapa 1: Construir o projeto Flutter
-FROM cirrusci/flutter:3.24.3 AS build
+# Stage 1: Build the Flutter application
+FROM ubuntu:22.04 AS builder
 
-# Definir o diretório de trabalho
+# Avoid interactive prompts during package installation
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install required dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    unzip \
+    xz-utils \
+    zip \
+    libglu1-mesa \
+    openjdk-11-jdk \
+    wget \
+    clang \
+    cmake \
+    ninja-build \
+    pkg-config \
+    libgtk-3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set up Flutter environment
+ENV FLUTTER_HOME=/usr/local/flutter
+ENV PATH=$FLUTTER_HOME/bin:$PATH
+
+RUN wget https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.24.3-stable.tar.xz \
+    && tar xf flutter_linux_3.24.3-stable.tar.xz -C /usr/local/ \
+    && rm flutter_linux_3.24.3-stable.tar.xz \
+    && flutter doctor \
+    && flutter config --no-analytics \
+    && flutter config --enable-web
+
+# Download and setup Flutter SDK
+#RUN git clone https://github.com/flutter/flutter.git $FLUTTER_HOME && \
+#    cd $FLUTTER_HOME && \
+#    git checkout 3.24.3 && \
+#    flutter doctor && \
+#    flutter config --no-analytics && \
+#    flutter config --enable-web
+
+# Set the working directory
 WORKDIR /app
 
-# Copiar o arquivo de dependências e instalar
-COPY pubspec.yaml /app
-RUN flutter pub cache repair
-RUN flutter pub get
-
-# Copiar o código fonte do projeto
+# Copy the Flutter project files
 COPY . .
 
-# Construir o projeto para a web
+# Get Flutter dependencies
+RUN flutter pub get
+
+# Build for web
 RUN flutter build web --release
-#====================================================================
-# Etapa 2: Configurar o NGINX para servir o app Flutter
+
+# Stage 2: Serve the application using Nginx
 FROM nginx:alpine
 
-# Remover a configuração padrão do NGINX
-RUN rm /etc/nginx/conf.d/default.conf
+# Copy the built Flutter web app to Nginx's serve directory
+COPY --from=builder /app/build/web /usr/share/nginx/html
 
-# Copiar a configuração customizada do NGINX
-COPY nginx.conf /etc/nginx/conf.d/
+# Copy custom Nginx configuration if needed
+# COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copiar o build da etapa anterior para o diretório do NGINX
-COPY --from=build /app/build/web /usr/share/nginx/html
-
-# Expor a porta onde o NGINX vai rodar
+# Expose port 80
 EXPOSE 80
 
-# Iniciar o NGINX
+# Start Nginx server
 CMD ["nginx", "-g", "daemon off;"]
