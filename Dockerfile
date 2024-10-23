@@ -1,11 +1,12 @@
 # Etapa 1: Construir o projeto Flutter
-FROM cirrusci/flutter:stable as build
+FROM cirrusci/flutter:3.24.3 AS build
 
 # Definir o diretório de trabalho
 WORKDIR /app
 
 # Copiar o arquivo de dependências e instalar
-COPY pubspec.yaml .
+COPY pubspec.yaml /app
+RUN flutter pub cache repair
 RUN flutter pub get
 
 # Copiar o código fonte do projeto
