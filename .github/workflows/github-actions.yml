@@ -3,11 +3,11 @@ name: Deploy Container on Commit
 on:
   push:
     branches:
-      - main  # ou o branch que você deseja monitorar
+      - Lucas  
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Check out the code
@@ -20,9 +20,10 @@ jobs:
         username: ${{ secrets.SSH_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          cd /caminho/do/projeto # Navegar até o diretório do projeto na VM
-          git pull origin main # Atualizar o repositório com as últimas mudanças
-          docker build -t your-image-name:latest . # Build da nova imagem
-          docker stop your-container-name || true # Parar o container antigo
-          docker rm your-container-name || true # Remover o container antigo
-          docker run -d --name your-container-name -p 80:80 your-image-name:latest # Rodar o novo container
+          cd /home/cab/NuvemFront
+          git pull origin ${{ github.ref_name }}
+          git checkout ${{ github.ref_name }}
+          docker build -t nuvemfront .
+          docker stop nuvemfront || true
+          docker rm nuvemfront || true
+          docker run -d --name nuvemfront -p 8080:80 nuvemfront
