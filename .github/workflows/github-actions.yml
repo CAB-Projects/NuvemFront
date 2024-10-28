@@ -1,18 +1,46 @@
-name: GitHub Actions Demo
-run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
-on: [push]
+name: Deploy Container on Commit
+
+on:
+  push:
+    branches:
+      - Lucas
+
 jobs:
-  Explore-GitHub-Actions:
-    runs-on: ubuntu-latest
+  deploy:
+    runs-on: ubuntu-22.04
+
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-      - name: Check out repository code
-        uses: actions/checkout@v4
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-      - name: List files in the repository
-        run: |
-          ls ${{ github.workspace }}
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+    - name: Check out the code
+      uses: actions/checkout@v2
+
+    - name: Build Docker image
+      run: |
+        docker build -t nuvemfront .
+
+    - name: Save Docker image as .tar
+      run: |
+        docker save nuvemfront -o image.tar
+      # Essa etapa salva a imagem em um arquivo `image.tar`
+
+    - name: Copy Docker image to VM
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        source: ./image.tar
+        target: /home/${{ secrets.SSH_USER }}/image.tar
+      # Esta etapa transfere o arquivo `image.tar` para a VM
+
+    - name: SSH into VM and Deploy Container
+      uses: appleboy/ssh-action@v0.1.7
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          docker load -i /home/${{ secrets.SSH_USER }}/image.tar
+          docker stop nuvemfront || true
+          docker rm nuvemfront || true
+          docker run -d --name nuvemfront -p 8080:80 nuvemfront
+      # Carrega a imagem na VM e reinicia o container com a nova versão
