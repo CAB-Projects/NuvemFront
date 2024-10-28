@@ -1,0 +1,46 @@
+name: Deploy Container on Commit
+
+on:
+  push:
+    branches:
+      - Lucas
+
+jobs:
+  deploy:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: Check out the code
+      uses: actions/checkout@v2
+
+    - name: Build Docker image
+      run: |
+        docker build -t nuvemfront .
+
+    - name: Save Docker image as .tar
+      run: |
+        docker save nuvemfront -o image.tar
+      # Essa etapa salva a imagem em um arquivo `image.tar`
+
+    - name: Copy Docker image to VM
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        source: ./image.tar
+        target: /home/${{ secrets.SSH_USER }}/image.tar
+      # Esta etapa transfere o arquivo `image.tar` para a VM
+
+    - name: SSH into VM and Deploy Container
+      uses: appleboy/ssh-action@v0.1.7
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          docker load -i /home/${{ secrets.SSH_USER }}/image.tar
+          docker stop nuvemfront || true
+          docker rm nuvemfront || true
+          docker run -d --name nuvemfront -p 8080:80 nuvemfront
+      # Carrega a imagem na VM e reinicia o container com a nova versão
