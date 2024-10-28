@@ -13,20 +13,11 @@ jobs:
     - name: Check out the code
       uses: actions/checkout@v2
 
-    - name: SSH into VM, build and redeploy container
-      uses: appleboy/ssh-action@v0.1.7
-      with:
-        host: ${{ secrets.SSH_HOST }}
-        username: ${{ secrets.SSH_USER }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        passphrase: ${{ secrets.SSH_PASSPHRASE }} 
-        timeout: 60s       # Add this
-        command_timeout: 20m  # Add this
-        debug: true       # Add this temporarily to get more info
-        script: |
-          cd /home/cab/NuvemFront
-          git pull origin Lucas
-          docker build -t nuvemfront .
-          docker stop nuvemfront || true
-          docker rm nuvemfront || true
-          docker run -d --name nuvemfront -p 8080:80 nuvemfront
+    - name: build and redeploy container
+      run: |
+        cd /home/cab/NuvemFront
+        git pull origin Lucas
+        docker build -t nuvemfront .
+        docker stop nuvemfront || true
+        docker rm nuvemfront || true
+        docker run -d --name nuvemfront -p 8080:80 nuvemfront
