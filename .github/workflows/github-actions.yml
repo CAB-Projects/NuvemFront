@@ -20,6 +20,9 @@ jobs:
         username: ${{ secrets.SSH_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         passphrase: ${{ secrets.SSH_PASSPHRASE }} 
+        timeout: 60s       # Add this
+        command_timeout: 20m  # Add this
+        debug: true       # Add this temporarily to get more info
         script: |
           cd /home/cab/NuvemFront
           git pull origin Lucas
