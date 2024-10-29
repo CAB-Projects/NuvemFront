@@ -40,7 +40,7 @@ class _LoginPageState extends State<LoginPage> {
           autovalidateMode: AutovalidateMode.onUserInteraction,
           child: Column(
             children: [
-              Text('LOGIN!#&%¨l345'),
+              Text('LOGIN!#&%¨l3456'),
               ToggleButtons(
                 onPressed: (int index) {
                   setState(() {
