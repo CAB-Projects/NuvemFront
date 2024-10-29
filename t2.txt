@@ -1,0 +1,23 @@
+name: Deploy Container on Commit
+
+on:
+  push:
+    branches:
+      - Lucas  
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+    - name: Check out the code
+      uses: actions/checkout@v2
+
+    - name: build and redeploy container
+      run: |
+        cd /home/cab/NuvemFront
+        git pull origin Lucas
+        docker build -t nuvemfront .
+        docker stop nuvemfront || true
+        docker rm nuvemfront || true
+        docker run -d --name nuvemfront -p 8080:80 nuvemfront
